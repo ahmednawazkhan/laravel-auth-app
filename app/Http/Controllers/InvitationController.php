@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Invitation;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Notifications\InviteNotification;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Notification;
 
 class InvitationController extends Controller
 {
@@ -22,15 +24,21 @@ class InvitationController extends Controller
         }
 
         $token = substr(md5(rand(0, 9) . $request->email . time()), 0, 32);
+        // TODO: dont send email if this fails
         Invitation::create([
             'email' => $request->email,
             'invitation_token' =>  $token,
             'invitation_pin' =>  Str::random(6),
         ]);
 
+        $route = route('invite.register', ['token' => $token]);
+
+        Notification::route('mail', $request->email)
+            ->notify(new InviteNotification($route));
+
         return response()->json([
             'message' => 'Invitation created successfully',
-            'invitation-link' => route('invite.register', ['token' => $token]),
+            'invitation-link' => $route,
         ], 201);
     }
 
