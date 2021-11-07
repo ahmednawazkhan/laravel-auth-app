@@ -40,7 +40,7 @@ class InvitationController extends Controller
             ->notify(new InviteNotification($route));
 
         return response()->json([
-            'message' => 'Invitation created successfully',
+            'message' => 'Invitation created successfully. Copy below URL to Register Using Invite Call',
             'invitation-link' => $route,
         ], 201);
     }
@@ -51,6 +51,7 @@ class InvitationController extends Controller
         $validator = Validator::make($request->all(), [
             'token' => 'required',
             'password' => 'required|confirmed',
+            'user_name' => 'required|min:4|max:20|unique:users'
         ]);
 
         if ($validator->fails()) {
@@ -67,14 +68,15 @@ class InvitationController extends Controller
             'email' => $invitation->email,
             'password' => bcrypt($request->password),
             'user_role' => 'user',
+            'user_name' => $request->user_name,
         ]);
 
-        $route = route('register.confirm', ['token' => $invitation->token]);
+        $route = route('register.confirm', ['token' => $request->token]);
         Notification::route('mail', $invitation->email)
             ->notify(new PINConfirmationNotification($invitation->invitation_pin, $route));
 
         return response()->json([
-            'message' => 'Password created. Please check your inbox and confirm pin to login',
+            'message' => 'Password created. Please check your inbox and confirm pin to login. Use below URL to confirm user ',
             'confirm_token' => $route,
         ], 201);
     }
@@ -83,7 +85,7 @@ class InvitationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required',
-            'pin' => 'required',
+            'pin' => 'required|min:6',
         ]);
 
         if ($validator->fails()) {

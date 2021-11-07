@@ -43,6 +43,7 @@ class InviteNotification extends Notification
     {
         return (new MailMessage)
             ->line('You have been Invidted')
+            ->line('Send a POST request to ' . $this->invitation_url . ' to register user')
             ->action('Registration Link', $this->invitation_url)
             ->line('Thank you for using our application!');
     }
