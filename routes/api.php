@@ -18,6 +18,7 @@ use App\Http\Controllers\InvitationController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/invite/register', [InvitationController::class, 'register'])->name('invite.register');
+Route::post('/register/confirm', [InvitationController::class, 'confirmRegistration'])->name('register.confirm');
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {

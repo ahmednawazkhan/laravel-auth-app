@@ -7,19 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class InviteNotification extends Notification
+class PINConfirmationNotification extends Notification
 {
     use Queueable;
-    protected $invitation_url;
-
+    protected $pin;
+    protected $pin_confirm_url;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($invitation_url)
+    public function __construct($pin, $pin_confirm_url)
     {
-        $this->invitation_url = $invitation_url;
+        $this->pin = $pin;
+        $this->pin_confirm_url = $pin_confirm_url;
     }
 
     /**
@@ -42,9 +43,9 @@ class InviteNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->line('You have been Invidted')
-            ->action('Registration Link', $this->invitation_url)
-            ->line('Thank you for using our application!');
+            ->line('Please Confirm your pin.')
+            ->line($this->pin)
+            ->line('Send POST request to ' . $this->pin_confirm_url);
     }
 
     /**
